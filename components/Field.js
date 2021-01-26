@@ -4,6 +4,7 @@ import {
   Card,
   Collapsible,
   DisplayText,
+  Layout,
   RadioButton,
   Select,
   Stack,
@@ -12,25 +13,15 @@ import {
   TextStyle,
 } from "@shopify/polaris";
 import { MdExpandLess, MdExpandMore, MdDelete } from "react-icons/md";
-import FieldOption from "./FieldOption";
+import PropertiesComponent from "./properties.component";
 
-const OptionComponent = ({ optionState }) => {
+const FieldComponent = ({ fieldState }) => {
+  const optionTypes = ["Text", "Select", "Radio", "Checkbox"];
   const open = useState(false);
 
   const handleDelete = () => {
-    optionState.set(none);
+    fieldState.set(none);
   };
-
-  const handleAddOption = () => {
-    optionState.options.merge([
-      {
-        value: "",
-      },
-    ]);
-  };
-
-  const optionTypes = ["Text", "Select", "Radio", "Checkbox"];
-  const typesWithOptions = ["Select", "Radio", "Checkbox"];
 
   return (
     <Card subdued>
@@ -40,8 +31,8 @@ const OptionComponent = ({ optionState }) => {
             <TextField
               prefix="Label"
               helpText="This is the public label"
-              value={optionState.get().label}
-              onChange={(text) => optionState.label.set(text)}
+              value={fieldState.get().label}
+              onChange={(text) => fieldState.label.set(text)}
             />
           </Stack.Item>
           <Stack.Item>
@@ -64,16 +55,16 @@ const OptionComponent = ({ optionState }) => {
                 prefix="Unique ID"
                 placeholder="option-1"
                 helpText="This field should be unique"
-                value={optionState.name.get()}
-                onChange={(text) => optionState.name.set(text)}
+                value={fieldState.name.get()}
+                onChange={(text) => fieldState.name.set(text)}
               />
             </Stack.Item>
             <Stack.Item>
               <Select
                 label="Input type"
                 options={optionTypes}
-                onChange={(selected) => optionState.type.set(selected)}
-                value={optionState.type.get()}
+                onChange={(selected) => fieldState.type.set(selected)}
+                value={fieldState.type.get()}
               />
             </Stack.Item>
             <Stack.Item>
@@ -83,43 +74,24 @@ const OptionComponent = ({ optionState }) => {
                   <Stack>
                     <RadioButton
                       label="Yes"
-                      checked={optionState.required.get() == true}
-                      onChange={(checked) => optionState.required.set(true)}
+                      checked={fieldState.required.get() == true}
+                      onChange={(checked) => fieldState.required.set(true)}
                     />
                     <RadioButton
                       label="No"
-                      checked={optionState.required.get() == false}
-                      onChange={(checked) => optionState.required.set(false)}
+                      checked={fieldState.required.get() == false}
+                      onChange={(checked) => fieldState.required.set(false)}
                     />
                   </Stack>
                 </Stack.Item>
               </Stack>
             </Stack.Item>
           </Stack>
+          <PropertiesComponent fieldState={fieldState} />
         </Card.Section>
-        {typesWithOptions.includes(optionState.type.get()) && (
-          <Collapsible open={true}>
-            <Card.Section
-              title="Options"
-              actions={[{ content: "Add option", onAction: handleAddOption }]}
-            >
-              {optionState.options?.map((option, index) => {
-                console.log(index);
-                return (
-                  <FieldOption
-                    key={index}
-                    option={option}
-                    index={index}
-                    type={optionState.type.get()}
-                  />
-                );
-              })}
-            </Card.Section>
-          </Collapsible>
-        )}
       </Collapsible>
     </Card>
   );
 };
 
-export default OptionComponent;
+export default FieldComponent;

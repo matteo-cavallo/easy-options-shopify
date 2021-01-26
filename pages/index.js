@@ -24,19 +24,23 @@ const Index = ({ shop }) => {
       {
         name: "New template",
         conditionsRule: "any",
+        fields: [
+          {
+            label: "New Field",
+            name: "field-id",
+            type: "Text",
+            required: false,
+            properties: {
+              defaultValue: "",
+              placeholder: "",
+            },
+          },
+        ],
         conditions: [
           {
             target: "product-category",
             rule: "equals",
             text: "",
-          },
-        ],
-        options: [
-          {
-            label: "New Option",
-            name: "Option",
-            type: "Text",
-            required: false,
           },
         ],
       },

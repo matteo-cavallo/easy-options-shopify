@@ -12,24 +12,23 @@ import {
 } from "@shopify/polaris";
 import { MdDelete, MdExpandLess, MdExpandMore } from "react-icons/md";
 import ConditionComponent from "./Condition";
-import OptionComponent from "./Option";
+import FieldComponent from "./Field";
 
-const Template = ({ templateState, saveButtonDisabled }) => {
+const Template = ({ templateState }) => {
   const open = useState(false);
 
   const handleAddOption = () => {
-    const id = templateState.options.get().length + 1;
-    templateState.options.merge([
+    const id = templateState.fields.get().length + 1;
+    templateState.fields.merge([
       {
         label: `Label ${id}`,
-        name: "Name",
+        name: "field-id",
         type: "Text",
         required: false,
-        options: [
-          {
-            value: "",
-          },
-        ],
+        properties: {
+          defaultValue: "",
+          placeholder: "",
+        },
       },
     ]);
   };
@@ -46,12 +45,6 @@ const Template = ({ templateState, saveButtonDisabled }) => {
 
   const handleDelete = () => {
     templateState.set(none);
-  };
-
-  const handleChange = (name, value) => {
-    templateState[name].set(value);
-    // Call to update state count
-    saveButtonDisabled.set(false);
   };
 
   return (
@@ -83,8 +76,8 @@ const Template = ({ templateState, saveButtonDisabled }) => {
           title="Fields"
           actions={[{ content: "Add field", onAction: handleAddOption }]}
         >
-          {templateState.options.map((option, index) => (
-            <OptionComponent key={index} optionState={option} />
+          {templateState.fields.map((field, index) => (
+            <FieldComponent key={index} fieldState={field} />
           ))}
         </Card.Section>
         <Card.Section
