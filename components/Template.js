@@ -23,12 +23,11 @@ const Template = ({ templateState }) => {
       {
         label: `Label ${id}`,
         name: "field-id",
+        description: "",
         type: "Text",
         required: false,
-        properties: {
-          defaultValue: "",
-          placeholder: "",
-        },
+        properties: {},
+        options: [],
       },
     ]);
   };

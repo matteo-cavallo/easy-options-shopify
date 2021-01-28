@@ -28,8 +28,10 @@ const Index = ({ shop }) => {
           {
             label: "New Field",
             name: "field-id",
+            description: "",
             type: "Text",
             required: false,
+            options: [],
             properties: {
               defaultValue: "",
               placeholder: "",

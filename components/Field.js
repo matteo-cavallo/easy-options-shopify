@@ -13,7 +13,7 @@ import {
   TextStyle,
 } from "@shopify/polaris";
 import { MdExpandLess, MdExpandMore, MdDelete } from "react-icons/md";
-import PropertiesComponent from "./properties.component";
+import RadioOptionComponent from "./radio.component";
 
 const FieldComponent = ({ fieldState }) => {
   const optionTypes = ["Text", "Select", "Radio", "Checkbox"];
@@ -21,6 +21,16 @@ const FieldComponent = ({ fieldState }) => {
 
   const handleDelete = () => {
     fieldState.set(none);
+  };
+
+  const addOption = () => {
+    fieldState.options.merge([
+      {
+        value: "",
+        description: "",
+        default: false,
+      },
+    ]);
   };
 
   return (
@@ -87,7 +97,53 @@ const FieldComponent = ({ fieldState }) => {
               </Stack>
             </Stack.Item>
           </Stack>
-          <PropertiesComponent fieldState={fieldState} />
+          <div style={{ height: "1rem" }}></div>
+          <Stack>
+            <Stack.Item fill>
+              <TextField
+                label="Description"
+                value={fieldState.description.get()}
+                onChange={(value) => fieldState.description.set(value)}
+              />
+            </Stack.Item>
+          </Stack>
+          {["Radio", "Select", "Checkbox"].includes(fieldState.type.get()) && (
+            <div>
+              <div style={{ height: "1rem" }}></div>
+              <Card.Section
+                title="Options"
+                actions={[{ content: "Add option", onAction: addOption }]}
+              >
+                <Stack vertical>
+                  {fieldState.options.map((o, index) => {
+                    console.log(o.label.get());
+                    return (
+                      <Stack>
+                        <Stack.Item>
+                          <TextField
+                            prefix={`${index}`}
+                            placeholder="Value"
+                            value={o.label.get()}
+                            onChange={(value) => o.label.set(value)}
+                          />
+                        </Stack.Item>
+                        <Stack.Item fill>
+                          <TextField
+                            placeholder="Description"
+                            value={o.description.get()}
+                            onChange={(value) => o.description.set(value)}
+                          />
+                        </Stack.Item>
+                        <Stack.Item>
+                          <Button icon={MdDelete} onClick={() => o.set(none)} />
+                        </Stack.Item>
+                      </Stack>
+                    );
+                  })}
+                </Stack>
+              </Card.Section>
+            </div>
+          )}
         </Card.Section>
       </Collapsible>
     </Card>
