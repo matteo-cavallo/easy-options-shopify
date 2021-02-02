@@ -12,6 +12,12 @@ import { doc } from "prettier";
 import Cors from "@koa/cors";
 import { getProductTemplates } from "../controller/templates";
 import { template } from "@babel/core";
+import {
+  checkSnippetExists,
+  getActiveThemeId,
+  installSnippet,
+} from "../startup/install";
+import { rgbString } from "@shopify/polaris";
 
 dotenv.config();
 const port = parseInt(process.env.PORT, 10) || 8081;
@@ -48,16 +54,18 @@ app.prepare().then(() => {
 
       async afterAuth(ctx) {
         // Access token and shop available in ctx.state.shopify
-        const { shop } = ctx.state.shopify;
+        const { shop, accessToken } = ctx.state.shopify;
 
         console.log(ctx.state.shopify);
 
+        // Se lo store non è registrato aggiungere lo shop in firebase
         const ref = firestore.collection("stores").doc(shop);
         ref.get().then((doc) => {
           if (!doc.exists) {
             console.log("DA CREARE");
             ref
               .set({
+                // Setting up iniziale del documento di firebase
                 templates: [],
               })
               .then(() => {
@@ -67,6 +75,24 @@ app.prepare().then(() => {
             console.log("Benvenuto ", shop);
           }
         });
+
+        // Controllo file di installazione
+        const id = await getActiveThemeId(shop, accessToken);
+        checkSnippetExists(shop, accessToken, id)
+          .then((res) => {
+            if (res) {
+              // Lo snippet è installato correttamente
+              console.log("Snippet Installato correttamente");
+            } else {
+              // Lo snippet non è installato pertanto va installato
+              console.log("Snippet non installato");
+              // Caricamento dello snippet su Shopify
+              installSnippet(shop, accessToken, id).then((res) => {
+                console.log("Snippet caricato con successo");
+              });
+            }
+          })
+          .catch((err) => console.log(err));
 
         // Redirect to app with shop parameter upon auth
         ctx.redirect(`/?shop=${shop}`);
