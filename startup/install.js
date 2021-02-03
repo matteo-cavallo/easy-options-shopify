@@ -10,7 +10,66 @@ const snippet = `{% if product %}
 <script src="https://4dbbad62a3e7.ngrok.io/easy-option.js" type="text/javascript"/>
 {%endif%}`;
 
-const SNIPPET = "pippo.liquid";
+const SNIPPET = "easy-options.liquid";
+
+async function snippetExists(shop, token, themeId) {
+  return new Promise((accept, reject) => {
+    fetch(
+      `https://${shop}/admin/api/2021-01/themes/${themeId}/assets.json?asset[key]=layout/theme.liquid`,
+      {
+        headers: {
+          "X-Shopify-Access-Token": token,
+        },
+      }
+    )
+      .then((res) => res.json())
+      .then(async (data) => {
+        let file = data.asset.value;
+
+        if (file.includes("{% render 'easy-options' %}")) {
+          // Include già la chiamata allo snippet
+          accept(true);
+        } else {
+          // Non include la chiamata allo snippet
+          // Quindi va aggiunto
+
+          // Si aggiunge alla fine del file lo snippet
+          file = file.concat("{% render 'easy-options' %}");
+          accept(file);
+        }
+      })
+      .catch((err) => {
+        reject(err);
+      });
+  });
+}
+
+async function addSnippetInsideTheme(shop, token, themeId, file) {
+  return new Promise((accept, reject) => {
+    fetch(`https://${shop}/admin/api/2021-01/themes/${themeId}/assets.json`, {
+      headers: {
+        "X-Shopify-Access-Token": token,
+        "Content-Type": "application/json",
+      },
+      method: "PUT",
+      body: JSON.stringify({
+        asset: {
+          key: "layout/theme.liquid",
+          value: file,
+        },
+      }),
+    })
+      .then((res) => {
+        console.log(res);
+        console.log("Aggiunto");
+        accept("Snippet caricato con successo in theme.liquid");
+      })
+      .catch((e) => {
+        console.log("Non aggiunto", e);
+        reject("Errore upload snippet nel file theme.liquid", e);
+      });
+  });
+}
 
 async function installSnippet(shop, accessToken, themeId) {
   return new Promise((accept, reject) => {
@@ -80,4 +139,10 @@ function checkSnippetExists(shop, accessToken, themeId) {
   });
 }
 
-export { getActiveThemeId, checkSnippetExists, installSnippet };
+export {
+  getActiveThemeId,
+  checkSnippetExists,
+  installSnippet,
+  snippetExists,
+  addSnippetInsideTheme,
+};

@@ -16,6 +16,8 @@ import {
   checkSnippetExists,
   getActiveThemeId,
   installSnippet,
+  addSnippetInsideTheme,
+  snippetExists,
 } from "../startup/install";
 import { rgbString } from "@shopify/polaris";
 
@@ -78,7 +80,7 @@ app.prepare().then(() => {
 
         // Controllo file di installazione
         const id = await getActiveThemeId(shop, accessToken);
-        checkSnippetExists(shop, accessToken, id)
+        await checkSnippetExists(shop, accessToken, id)
           .then((res) => {
             if (res) {
               // Lo snippet è installato correttamente
@@ -93,6 +95,20 @@ app.prepare().then(() => {
             }
           })
           .catch((err) => console.log(err));
+
+        // Controllo dello snippet nel file theme.id
+        const theme = await snippetExists(shop, accessToken, id);
+
+        if (theme !== true) {
+          console.log("provo ad installare lo snippet in theme.liquid");
+          addSnippetInsideTheme(shop, accessToken, id, theme)
+            .then((res) => {
+              console.log("Satus:", res.status, "Body: ", res.body);
+            })
+            .catch((err) => console.log(err));
+        } else {
+          console.log("Lo snippet è già inserito in theme.liquid");
+        }
 
         // Redirect to app with shop parameter upon auth
         ctx.redirect(`/?shop=${shop}`);
