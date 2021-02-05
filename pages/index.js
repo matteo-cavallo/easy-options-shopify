@@ -86,7 +86,8 @@ const Index = ({ shop }) => {
 export default Index;
 
 export async function getServerSideProps(context) {
-  const shop = context.query.shop;
+  const { shop } = context.query;
+
   console.log("Shop request: ", shop);
   return {
     props: {

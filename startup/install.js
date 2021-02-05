@@ -7,7 +7,7 @@ const snippet = `{% if product %}
   }
 </script>
 
-<script src="https://4dbbad62a3e7.ngrok.io/easy-option.js" type="text/javascript"/>
+<script src="${process.env.HOST}/easy-option.js" type="text/javascript"/>
 {%endif%}`;
 
 const SNIPPET = "easy-options.liquid";
@@ -34,8 +34,17 @@ async function snippetExists(shop, token, themeId) {
           // Quindi va aggiunto
 
           // Si aggiunge alla fine del file lo snippet
-          file = file.concat("{% render 'easy-options' %}");
-          accept(file);
+          let arr = file.split("{{ content_for_header }}");
+
+          let str =
+            arr[0] +
+            " {{ content_for_header }} " +
+            " {% render 'easy-options' %} " +
+            arr[1];
+
+          console.log(str);
+          //file = file.concat("{% render 'easy-options' %}");
+          accept(str);
         }
       })
       .catch((err) => {
@@ -60,7 +69,7 @@ async function addSnippetInsideTheme(shop, token, themeId, file) {
       }),
     })
       .then((res) => {
-        console.log(res);
+        //console.log(res);
         console.log("Aggiunto");
         accept("Snippet caricato con successo in theme.liquid");
       })

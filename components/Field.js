@@ -16,7 +16,7 @@ import { MdExpandLess, MdExpandMore, MdDelete } from "react-icons/md";
 import RadioOptionComponent from "./radio.component";
 
 const FieldComponent = ({ fieldState }) => {
-  const optionTypes = ["Text", "Select", "Radio", "Checkbox"];
+  const optionTypes = ["Text", "Select", "Radio", "Checkbox", "Buttons"];
   const open = useState(false);
 
   const handleDelete = () => {
@@ -102,12 +102,15 @@ const FieldComponent = ({ fieldState }) => {
             <Stack.Item fill>
               <TextField
                 label="Description"
+                placeholder="Insert here field's description (optional)"
                 value={fieldState.description.get()}
                 onChange={(value) => fieldState.description.set(value)}
               />
             </Stack.Item>
           </Stack>
-          {["Radio", "Select", "Checkbox"].includes(fieldState.type.get()) && (
+          {["Radio", "Select", "Checkbox", "Buttons"].includes(
+            fieldState.type.get()
+          ) && (
             <div>
               <div style={{ height: "1rem" }}></div>
               <Card.Section
@@ -129,7 +132,7 @@ const FieldComponent = ({ fieldState }) => {
                         </Stack.Item>
                         <Stack.Item fill>
                           <TextField
-                            placeholder="Description"
+                            placeholder="Description (optional)"
                             value={o.description.get()}
                             onChange={(value) => o.description.set(value)}
                           />

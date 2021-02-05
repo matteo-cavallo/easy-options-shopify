@@ -102,9 +102,7 @@ app.prepare().then(() => {
         if (theme !== true) {
           console.log("provo ad installare lo snippet in theme.liquid");
           addSnippetInsideTheme(shop, accessToken, id, theme)
-            .then((res) => {
-              console.log("Satus:", res.status, "Body: ", res.body);
-            })
+            .then((res) => {})
             .catch((err) => console.log(err));
         } else {
           console.log("Lo snippet è già inserito in theme.liquid");
@@ -136,7 +134,36 @@ app.prepare().then(() => {
       };
     }
   });
-  router.get("(.*)", verifyRequest(), async (ctx) => {
+
+  router.get("/api/refreshSnippet", verifyRequest(), async (ctx) => {
+    const { shop, accessToken } = ctx.session;
+
+    // Controllo file di installazione
+    const id = await getActiveThemeId(shop, accessToken);
+    await checkSnippetExists(shop, accessToken, id)
+      .then((res) => {
+        // Caricamento dello snippet su Shopify
+        installSnippet(shop, accessToken, id).then((res) => {
+          console.log("Snippet caricato con successo");
+        });
+      })
+      .catch((err) => console.log(err));
+
+    // Controllo dello snippet nel file theme.id
+    const theme = await snippetExists(shop, accessToken, id);
+
+    if (theme !== true) {
+      console.log("provo ad installare lo snippet in theme.liquid");
+      addSnippetInsideTheme(shop, accessToken, id, theme)
+        .then((res) => {
+          console.log("Satus:", res.status, "Body: ", res.body);
+        })
+        .catch((err) => console.log(err));
+    } else {
+      console.log("Lo snippet è già inserito in theme.liquid");
+    }
+  });
+  router.get("(.*)", async (ctx) => {
     await handle(ctx.req, ctx.res);
     ctx.respond = false;
     ctx.res.statusCode = 200;
